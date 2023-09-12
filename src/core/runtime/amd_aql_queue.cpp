@@ -98,7 +98,10 @@ AqlQueue::AqlQueue(GpuAgent* agent, size_t req_size_pkts, HSAuint32 node_id, Scr
       exceptionState(0),
       suspended_(false),
       priority_(HSA_QUEUE_PRIORITY_NORMAL),
-      exception_signal_(nullptr) {
+      exception_signal_(nullptr),
+      /*</AliJahan>*/
+      cumask_ctrlr(nullptr)
+      /*<AliJahan/>*/ {
   // When queue_full_workaround_ is set to 1, the ring buffer is internally
   // doubled in size. Virtual addresses in the upper half of the ring allocation
   // are mapped to the same set of pages backing the lower half.
@@ -316,7 +319,14 @@ AqlQueue::AqlQueue(GpuAgent* agent, size_t req_size_pkts, HSAuint32 node_id, Scr
   if (!core::Runtime::runtime_singleton_->flag().cu_mask_skip_init()) SetCUMasking(0, nullptr);
 
   active_ = true;
-
+  //</AliJahan>
+  char * controller_path_flag = getenv("CUMASKING_CONTROLLER_LOG");
+  if (controller_path_flag != nullptr) {
+    std::string path(controller_path_flag);
+    cumask_ctrlr = new Controller::ControllerThread<rocr::AMD::AqlQueue>(this, path);
+    cumask_ctrlr->run();
+  }
+  //<AliJahan/>
   PM4IBGuard.Dismiss();
   RingGuard.Dismiss();
   QueueGuard.Dismiss();
@@ -325,6 +335,13 @@ AqlQueue::AqlQueue(GpuAgent* agent, size_t req_size_pkts, HSAuint32 node_id, Scr
 }
 
 AqlQueue::~AqlQueue() {
+  //</AliJahan>
+  if(cumask_ctrlr != nullptr){
+    cumask_ctrlr->stop();
+    delete cumask_ctrlr;
+    cumask_ctrlr = nullptr;
+  }
+  //<AliJahan/>
   // Remove error handler synchronously.
   // Sequences error handler callbacks with queue destroy.
   dynamicScratchState |= ERROR_HANDLER_TERMINATE;

@@ -176,6 +176,7 @@ set ( SRCS core/util/lnx/os_linux.cpp
            core/runtime/hsa_ext_interface.cpp
            core/runtime/interrupt_signal.cpp
            core/runtime/intercept_queue.cpp
+           core/runtime/resource_controller.cpp # <AliJahan/>
            core/runtime/ipc_signal.cpp
            core/runtime/isa.cpp
            core/runtime/runtime.cpp
