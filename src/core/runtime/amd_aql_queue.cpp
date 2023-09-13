@@ -1100,7 +1100,7 @@ hsa_status_t AqlQueue::SetCUMasking(uint32_t num_cu_mask_count, const uint32_t* 
   if (num_cu_mask_count == 0) {
     for (int i = 0; i < mask_dwords; i++) mask.push_back(-1);
   } else {
-    for (int i = 0; i < num_cu_mask_count / 32; i++) mask.push_back(cu_mask[i]);
+    for (int i = 0; i < (num_cu_mask_count+ 31) / 32; i++) mask.push_back(cu_mask[i]);
   }
 
   // Apply global mask to user mask
