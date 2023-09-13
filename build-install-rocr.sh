@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-INSTALL_DIR=${HOME}/.opt
+INSTALL_DIR=/opt
 CMAKE=/usr/bin/cmake
 CC_DIR=${INSTALL_DIR}/rocm/llvm/bin/clang
 CXX_DIR=${INSTALL_DIR}/rocm/llvm/bin/clang++
