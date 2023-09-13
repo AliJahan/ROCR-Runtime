@@ -205,13 +205,22 @@ namespace Controller{
                     if (requested_cus != current_cus){ // update cu mask if changed
                         uint32_t mask[2] = {0U, 0U}; // init mask
                         make_cu_mask(requested_cus, mask); // make mask for requested num cus
-                        queue_->SetCUMasking(requested_cus, mask); // set the queue mask through ioctl call
-                        log += get_current_date_time() + " <_CU_MASK_SET_> " + \
-                            "q_id:" + uint2hexstr(queue_id) + " " + \
-                            "num_cu:" + std::to_string(requested_cus) + \
-                            " mask:" + uint2hexstr(mask[1]) + \
-                            "_" + uint2hexstr(mask[0])+ "\n";
-                        current_cus = requested_cus; 
+                        uint32_t res = queue_->SetCUMasking(requested_cus, mask); // set the queue mask through ioctl call
+                        if(res != 0){
+                            log += get_current_date_time() + " <_CU_MASK_SET_> " + \
+                                "q_id:" + uint2hexstr(queue_id) + " " + \
+                                "num_cu:" + std::to_string(requested_cus) + \
+                                " mask:" + uint2hexstr(mask[1]) + \
+                                "_" + uint2hexstr(mask[0])+ "\n";
+                            current_cus = requested_cus;
+                        }else{
+                            log += get_current_date_time() + " <MASKSET_ERROR> " + \
+                                "error_code:" + std::to_string(res) + " " + \
+                                "q_id:" + uint2hexstr(queue_id) + " " + \
+                                "num_cu:" + std::to_string(requested_cus) + \
+                                " mask:" + uint2hexstr(mask[1]) + \
+                                "_" + uint2hexstr(mask[0])+ "\n";
+                        }
                         rcvd++;
                         // if(rcvd > DUMP_LOG_EVERY_CUMASK_SET){
                             dump_log(log);
