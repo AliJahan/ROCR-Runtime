@@ -213,9 +213,9 @@ namespace Controller{
                             "_" + uint2hexstr(mask[0])+ "\n";
                         current_cus = requested_cus; 
                         rcvd++;
-                        if(rcvd > DUMP_LOG_EVERY_CUMASK_SET){
+                        // if(rcvd > DUMP_LOG_EVERY_CUMASK_SET){
                             dump_log(log);
-                        }
+                        // }
                     } // if(requested_cus != ..)
                 } // if(requested_cus>=0U...)
                 std::this_thread::sleep_for(std::chrono::milliseconds(200));
@@ -230,7 +230,6 @@ namespace Controller{
                        "q_id:" + uint2hexstr(queue_id) + " " + \
                        "gpu_id:" + std::to_string(gpu_id) + "\n";
             }
-            
             
             // Record when queue stopped/deleted
             log += get_current_date_time() + " <QUEUE_DELETED> " + \
