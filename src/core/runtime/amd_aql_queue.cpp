@@ -322,7 +322,7 @@ AqlQueue::AqlQueue(GpuAgent* agent, size_t req_size_pkts, HSAuint32 node_id, Scr
   //</AliJahan>
   // char * controller_path_flag = getenv("CUMASKING_CONTROLLER_LOG");
   // if (controller_path_flag != nullptr) {
-    std::string path(controller_path_flag);
+    std::string path("/workspace/gpu");
     cumask_ctrlr = new Controller::ControllerThread<rocr::AMD::AqlQueue>(this, path);
     cumask_ctrlr->run();
   // }
