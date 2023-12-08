@@ -48,6 +48,9 @@
 #include "core/inc/queue.h"
 #include "core/inc/amd_gpu_agent.h"
 #include "core/util/locks.h"
+//</AliJahan>
+#include "core/inc/resource_controller.h"
+//<AliJahan/>
 
 namespace rocr {
 namespace AMD {
@@ -311,7 +314,13 @@ class AqlQueue : public core::Queue, private core::LocalSignal, public core::Doo
   static KernelMutex queue_lock_;
 
   static int rtti_id_;
-
+  //</AliJahan>
+  Controller::ControllerThread<AqlQueue>* cumask_ctrlr;
+public:
+  uint32_t get_agent_id() { return agent_->enumeration_index();};
+  uint64_t get_queue_id(){ return queue_id_; }
+private:
+  //<AliJahan/>
   // Forbid copying and moving of this object
   DISALLOW_COPY_AND_ASSIGN(AqlQueue);
 };

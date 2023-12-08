@@ -509,7 +509,7 @@ class Runtime {
 
   Runtime& operator=(const Runtime&);
 
-  ~Runtime() {}
+  ~Runtime() {/*</AliJahan>*/ Unload(); /*<AliJahan/>*/}
 
   /// @brief Open connection to kernel driver.
   hsa_status_t Load();

@@ -85,7 +85,7 @@ if (ROCM_CCACHE_BUILD)
 endif() # if (ROCM_CCACHE_BUILD)
 
 ## Get version strings
-get_version ( "1.11.0" )
+get_version ( "1.11.50701" )
 if ( ${ROCM_PATCH_VERSION} )
   set ( VERSION_PATCH ${ROCM_PATCH_VERSION})
 endif()
@@ -180,6 +180,7 @@ set ( SRCS core/util/lnx/os_linux.cpp
            core/runtime/hsa_ext_interface.cpp
            core/runtime/interrupt_signal.cpp
            core/runtime/intercept_queue.cpp
+	   core/runtime/resource_controller.cpp # <AliJahan/>
            core/runtime/ipc_signal.cpp
            core/runtime/isa.cpp
            core/runtime/runtime.cpp
