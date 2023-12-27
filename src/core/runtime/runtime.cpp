@@ -83,11 +83,11 @@ class RuntimeCleanup {
  public:
   ~RuntimeCleanup() {
     //</AliJahan>
-    {
-      ScopedAcquire<KernelMutex> boot(&Runtime::runtime_singleton_->bootstrap_lock_);
-      if(Runtime::runtime_singleton_->ref_count_ > 0)
-        Runtime::runtime_singleton_->ref_count_--;
-    }
+    // {
+    //   ScopedAcquire<KernelMutex> boot(&Runtime::runtime_singleton_->bootstrap_lock_);
+    //   if(Runtime::runtime_singleton_->ref_count_ > 0)
+    //     Runtime::runtime_singleton_->ref_count_--;
+    // }
     //<AliJahan/>
     if (!Runtime::IsOpen()) {
       delete Runtime::runtime_singleton_;
