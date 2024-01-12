@@ -67,7 +67,7 @@ namespace Controller{
         void read_cus_from_shm(uint32_t gpu_offset, uint32_t& mask0, uint32_t& mask1){
             pthread_mutex_lock(mutex_ptr); // start critical region
             mask0 = *(gpus_cu_mask_ptr + 2 * gpu_offset);
-            mask0 = *(gpus_cu_mask_ptr + 2 * gpu_offset + 1);
+            mask1 = *(gpus_cu_mask_ptr + 2 * gpu_offset + 1);
             pthread_mutex_unlock(mutex_ptr); // end critical region
         }
         
