@@ -37,8 +37,8 @@ namespace Controller{
         *   Then each ROCR aql_queue attaches to SHM with a thread monitoring the number of CUs for their assigned GPU and changing the CUMASK for the queue on demand.  
         * */
         uint32_t* num_gpus_ptr;     // One uint32_t to store number of gpus (set by create=true, num_gpus=X)
-        uint32_t* gpus_num_cu_ptr;  // Number of elemenets here is based on X value (line above) passed to cumasking_shm_init which is called by Controller
-        pthread_mutex_t *mutex_ptr;       // Pointer to the pthread mutex for IPC between threads accessing SHM
+        uint32_t* gpus_cu_mask_ptr;  // CU maksed passed to cumasking_shm_init which is called by Controller (2 uin32_t per GPU)
+        pthread_mutex_t *mutex_ptr; // Pointer to the pthread mutex for IPC between threads accessing SHM
 
         // Non-shared members (local to each process/thread)
         int shm_fd;           // Descriptor of shared memory object.
@@ -55,7 +55,7 @@ namespace Controller{
     
         CUMaskingSharedMemory():
             num_gpus_ptr(nullptr),
-            gpus_num_cu_ptr(nullptr),
+            gpus_cu_mask_ptr(nullptr),
             mutex_ptr(nullptr),
             shm_fd(-1),
             name(nullptr),
@@ -64,12 +64,11 @@ namespace Controller{
             shm_size(0U){}
 
         // read from SHM API
-        uint32_t read_cus_from_shm(uint32_t offset){
-            uint32_t data;
+        void read_cus_from_shm(uint32_t gpu_offset, uint32_t& mask0, uint32_t& mask1){
             pthread_mutex_lock(mutex_ptr); // start critical region
-            data = *(gpus_num_cu_ptr + offset);
+            mask0 = *(gpus_cu_mask_ptr + 2 * gpu_offset);
+            mask0 = *(gpus_cu_mask_ptr + 2 * gpu_offset + 1);
             pthread_mutex_unlock(mutex_ptr); // end critical region
-            return data;
         }
         
         uint32_t read_gpus_from_shm(){
@@ -200,11 +199,11 @@ namespace Controller{
             // Actual cu masking
             while(running_ && initted_){
                 // Get number of cus from SHM for this gpu (gpu_id)
-                uint32_t requested_cus = shm_->read_cus_from_shm(gpu_id);
-                if(requested_cus >= 1U && requested_cus <= 60U ){ // avoid invalid cu mask 
-                    if (requested_cus != current_cus){ // update cu mask if changed
-                        uint32_t mask[2] = {0U, 0U}; // init mask
-                        make_cu_mask(requested_cus, mask); // make mask for requested num cus
+                uint32_t mask[2] = {0U, 0U}; // mask
+                shm_->read_cus_from_shm(gpu_id, mask[0], mask[1]); // read mask from shm (ipc)
+                uint32_t requested_cus = count_set_bits(mask[0]) + count_set_bits(mask[1]);
+                if(requested_cus >=1 && requested_cus <= 60U ){ // avoid invalid cu mask for MI50
+                    if ((mask[0] + mask[1]) != current_cus){ // update cu mask if changed
                         uint32_t res = queue_->SetCUMasking(requested_cus, mask); // set the queue mask through ioctl call
                         if(res == 0){
                             log += get_current_date_time() + " <_CU_MASK_SET_> " + \
@@ -249,12 +248,14 @@ namespace Controller{
             dump_log(log);
         }
     private:
-        // Makes CU mask (64 bits) from given num_cu
-        void make_cu_mask(uint32_t num_cu, uint32_t* mask){
-            //fills mask with 1 from bit #0 to num_cu
-            for(uint32_t i = 0U; i < 61U && i < num_cu; i++){
-                mask[i / 32] |= 1U << i;
+        inline uint32_t count_set_bits(uint32_t n)
+        {
+            uint32_t count = 0;
+            while (n) {
+                n &= (n - 1);
+                count++;
             }
+            return count;
         }
 
         //////// Functionality
