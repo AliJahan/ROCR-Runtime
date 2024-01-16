@@ -134,7 +134,7 @@ namespace Controller{
             cumasking_shm->base_addr = base_addr;
             num_gpus_ptr = (uint32_t*)base_addr;
             uint32_t* gpus_mask_ptr = (uint32_t*)(num_gpus_ptr + 1U);
-            pthread_mutex_t *mutex_ptr = (pthread_mutex_t *)(gpus_mask_ptr + *(num_gpus_ptr));
+            pthread_mutex_t *mutex_ptr = (pthread_mutex_t *)(gpus_mask_ptr + (*(num_gpus_ptr) * 2U)); // 2 uint32_t per gpu
             cumasking_shm->mutex_ptr = mutex_ptr;
             cumasking_shm->num_gpus_ptr = num_gpus_ptr;
             cumasking_shm->gpus_cu_mask_ptr = gpus_mask_ptr;
