@@ -50,7 +50,7 @@ namespace Controller{
             // TODO: get it from ROCM API to support all gpus.
             for(uint32_t i = 0U; i < num_gpus; i++){
                 *(gpus_mask_ptr + i * 2) = 0xffffffff;
-                *(gpus_mask_ptr + i * 2 + 1) = 0xfffffff;
+                *(gpus_mask_ptr + i * 2 + 1) = 0x0fffffff;
             }
             // Initialize interprocess cumasking_shm in SHM
             pthread_mutex_t *mutex_ptr = (pthread_mutex_t *)(gpus_mask_ptr + 2 * num_gpus); // 2 unit32_t per gpu

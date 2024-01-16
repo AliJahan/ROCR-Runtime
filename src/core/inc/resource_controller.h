@@ -132,7 +132,8 @@ namespace Controller{
             queue_(queue),
             running_(false),
             initted_(false),
-            current_cus(60U),
+            current_mask0(0xffffffff),
+            current_mask1(0x0fffffff),
             monitor_thread(nullptr),
             log_path(
                 logpath+ "G" +std::to_string(queue->get_agent_id())
@@ -165,7 +166,8 @@ namespace Controller{
             // cleanup
             delete monitor_thread;
             monitor_thread = nullptr;
-            current_cus = 60U;
+            current_mask0 = 0xffffffff;
+            current_mask1= 0x0fffffff;
         }
 
         void monitor(){
@@ -203,22 +205,23 @@ namespace Controller{
                 shm_->read_cus_from_shm(gpu_id, mask[0], mask[1]); // read mask from shm (ipc)
                 uint32_t requested_cus = count_set_bits(mask[0]) + count_set_bits(mask[1]);
                 if(requested_cus >=1 && requested_cus <= 60U ){ // avoid invalid cu mask for MI50
-                    if ((mask[0] + mask[1]) != current_cus){ // update cu mask if changed
+                    if ((current_mask0 != mask[0]) || (current_mask1 != mask[1])){ // update cu mask if changed
                         uint32_t res = queue_->SetCUMasking(requested_cus, mask); // set the queue mask through ioctl call
                         if(res == 0){
                             log += get_current_date_time() + " <_CU_MASK_SET_> " + \
                                 "q_id:" + uint2hexstr(queue_id) + " " + \
                                 "num_cu:" + std::to_string(requested_cus) + \
-                                " mask:" + uint2hexstr(mask[1]) + \
-                                "_" + uint2hexstr(mask[0])+ "\n";
-                            current_cus = requested_cus;
+                                " mask:" + uint2hexstr(mask[0]) + \
+                                "_" + uint2hexstr(mask[1])+ "\n";
+                            current_mask0 = mask[0];
+                            current_mask1 = mask[1];
                         }else{
                             log += get_current_date_time() + " <MASKSET_ERROR> " + \
                                 "error_code:" + std::to_string(res) + " " + \
                                 "q_id:" + uint2hexstr(queue_id) + " " + \
                                 "num_cu:" + std::to_string(requested_cus) + \
-                                " mask:" + uint2hexstr(mask[1]) + \
-                                "_" + uint2hexstr(mask[0])+ "\n";
+                                " mask:" + uint2hexstr(mask[0]) + \
+                                "_" + uint2hexstr(mask[1])+ "\n";
                         }
                         rcvd++;
                         // if(rcvd > DUMP_LOG_EVERY_CUMASK_SET){
@@ -263,7 +266,8 @@ namespace Controller{
         T* queue_; // T is rocr::AMD::AqlQueue 
         std::atomic_bool running_; // for stopping monitor_thread
         std::atomic_bool initted_; // for stopping monitor_thread
-        std::atomic_uint32_t current_cus;
+        std::atomic_uint32_t current_mask0;
+        std::atomic_uint32_t current_mask1;
         std::thread* monitor_thread;
 
         /////// Logging 
