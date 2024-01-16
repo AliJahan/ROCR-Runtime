@@ -132,8 +132,8 @@ namespace Controller{
             queue_(queue),
             running_(false),
             initted_(false),
-            current_mask0(0xffffffff),
-            current_mask1(0x0fffffff),
+            current_mask0(0U),
+            current_mask1(0U),
             monitor_thread(nullptr),
             log_path(
                 logpath+ "G" +std::to_string(queue->get_agent_id())
