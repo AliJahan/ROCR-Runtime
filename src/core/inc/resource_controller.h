@@ -166,8 +166,8 @@ namespace Controller{
             // cleanup
             delete monitor_thread;
             monitor_thread = nullptr;
-            current_mask0 = 0xffffffff;
-            current_mask1= 0x0fffffff;
+            current_mask0 = 0U;
+            current_mask1= 0U;
         }
 
         void monitor(){
