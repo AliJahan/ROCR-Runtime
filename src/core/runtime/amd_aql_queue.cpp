@@ -1151,7 +1151,12 @@ hsa_status_t AqlQueue::SetCUMasking(uint32_t num_cu_mask_count, const uint32_t* 
         if (cu_pair && cu_pair != 0x3) return HSA_STATUS_ERROR_INVALID_ARGUMENT;
       }
     }
-
+    // Debugging <AliJahan/>
+    std::cout << "Mask: ";
+    for(uint32_t i = 0U; i < mask.size(); i++)
+      std::cout << mask[i] << " ";
+    std::cout << std::endl << std::flush;
+    // Debugging </AliJahan>
     HSAKMT_STATUS ret =
         hsaKmtSetQueueCUMask(queue_id_, mask.size() * 32, reinterpret_cast<HSAuint32*>(&mask[0]));
     if (ret != HSAKMT_STATUS_SUCCESS) return HSA_STATUS_ERROR;
