@@ -205,7 +205,7 @@ namespace Controller{
                     if (requested_cus != current_cus){ // update cu mask if changed
                         uint32_t mask[2] = {0U, 0U}; // init mask
                         make_cu_mask(requested_cus, mask); // make mask for requested num cus
-                        uint32_t res = queue_->SetCUMasking(requested_cus, mask); // set the queue mask through ioctl call
+                        uint32_t res = queue_->SetCUMasking(60, mask); // set the queue mask through ioctl call
                         if(res == 0){
                             log += get_current_date_time() + " <_CU_MASK_SET_> " + \
                                 "q_id:" + uint2hexstr(queue_id) + " " + \
