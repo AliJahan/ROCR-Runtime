@@ -206,7 +206,7 @@ namespace Controller{
                 uint32_t requested_cus = count_set_bits(mask[0]) + count_set_bits(mask[1]);
                 if(requested_cus >=1 && requested_cus <= 60U ){ // avoid invalid cu mask for MI50
                     if ((current_mask0 != mask[0]) || (current_mask1 != mask[1])){ // update cu mask if changed
-                        uint32_t res = queue_->SetCUMasking(requested_cus, mask); // set the queue mask through ioctl call
+                        uint32_t res = queue_->SetCUMasking(60, mask); // set the queue mask through ioctl call
                         if(res == 0){
                             log += get_current_date_time() + " <_CU_MASK_SET_> " + \
                                 "q_id:" + uint2hexstr(queue_id) + " " + \
